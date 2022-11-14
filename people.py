@@ -1,10 +1,10 @@
 from __future__ import annotations
 from operator import attrgetter
 from dataclasses import dataclass, replace
-from typing import Sequence, Iterator
+from typing import Sequence, Iterator, Optional
 
 from faker import Faker
-from hypothesis import given
+from hypothesis import given, note
 import hypothesis.strategies as st
 
 
@@ -64,49 +64,55 @@ class People(Sequence[Person]):
     def new_year(self) -> People:
         return self.map(lambda person: person.with_age(person.age + 1))
 
+    def kids(self) -> People:
+        return self.filter(lambda person: person.age <= 10)
+
     def grown_ups(self) -> People:
-        return self.filter(lambda person: person.age > 18)
+        return self.filter(lambda person: person.age >= 18)
 
     @classmethod
     def from_list(cls, people):
         return cls(*people)
 
 
-a_person = st.builds(
+an_adult = st.builds(
     Person,
     first_name=st.builds(fake.first_name),
     last_name=st.builds(fake.last_name),
-    age=st.integers(min_value=0, max_value=120),
+    age=st.integers(min_value=18, max_value=120),
 )
 
-a_kid = a_person.filter(lambda person: person.age <= 10)
+a_kid = st.builds(
+    Person,
+    first_name=st.builds(fake.first_name),
+    last_name=st.builds(fake.last_name),
+    age=st.integers(min_value=0, max_value=10),
+)
 
-@st.composite
-def create_family(draw, family_name: str) -> People:
-    parent1 = draw(a_person, last_name=family_name)
-    parent2 = draw(a_person, last_name=family_name)
-    n_kids = draw(st.integers(min_value=0, max_value=5))
-    kids = [draw(a_kid, last_name=family_name) for _ in n_kids] 
+def create_family(data, last_name: Optional[str] = None, n_kids: Optional[int] = None) -> People:
+    family_name = last_name or fake.last_name()
+    parents = [data.draw(an_adult) for _ in range(2)]
+    total_kids: int = n_kids or data.draw(st.integers(min_value=0, max_value=5))
+    kids = [data.draw(a_kid) for _ in range(total_kids)]
 
-    return People(parent1, parent2, *kids)
+    return People(*parents, *kids).map(lambda person: person.with_last_name(family_name))
     
 
-some_people = st.builds(People.from_list, st.lists(a_person, min_size=0))
-a_family = st.builds(create_family, family_name=st.builds(fake.last_name))
+some_people = st.builds(People.from_list, st.lists(an_adult, min_size=0))
 
 
-@given(a_person)
+@given(an_adult)
 def test_that_a_person_will_not_live_more_than_200_years_yet(person):
     assert person.age <= 200
 
 
-@given(a_person)
+@given(an_adult)
 def test_that_a_persons_full_name_contains_first_and_last_name(person):
     assert person.full_name.startswith(person.first_name)
     assert person.full_name.endswith(person.last_name)
 
 
-@given(a_person.filter(lambda p: p.age > 18))
+@given(an_adult.filter(lambda p: p.age > 18))
 def test_that_a_grownup_is_of_age(person):
     assert person.is_of_age
 
@@ -122,3 +128,11 @@ def test_that_a_new_year_adds_n_total_years_across_people(people):
 @given(st.builds(People.from_list, st.lists(a_kid)))
 def test_that_no_kid_is_a_grownup(kids):
     assert kids.grown_ups() == People()
+
+@given(st.data())
+def test_that_a_family_has_two_adults_and_may_have_no_kids(data):
+    family = create_family(data)
+    note(f"Family {family.map(lambda p: (p.full_name, p.age))}")
+
+    assert len(family.grown_ups()) == 2
+    assert len(family.kids()) >= 0
