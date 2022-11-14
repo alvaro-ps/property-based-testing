@@ -29,4 +29,12 @@ jobs:
           flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
       - name: Test with pytest
         run: |
-          CI_ROLE=ci python -m pytest tests/* --hypothesis-show-statistics --verbose
+          CI_ROLE=ci coverage run -m pytest tests/* \
+            --hypothesis-show-statistics \
+            --cov-report xml:output/coverage.yml \
+            --verbose
+      - name: Get coverage
+        uses: orgoro/coverage@v3
+        with:
+          coverageFile: output/coverage.xml
+          token: ${{ secrets.GH_TOKEN }}
