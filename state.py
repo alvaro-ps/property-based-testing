@@ -2,15 +2,11 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Generic, Optional, TypeVar
 import heapq
-
-from faker import Faker
 from hypothesis import given
 import hypothesis.strategies as st
-from hypothesis.stateful import Bundle, RuleBasedStateMachine, rule, precondition, invariant
+from hypothesis.stateful import  RuleBasedStateMachine, rule, precondition, invariant
 
 T = TypeVar("T")
-
-fake = Faker()
 
 """
 Domain
@@ -42,8 +38,20 @@ class Heap(Generic[T]):
 Data generation strategies
 """
 a_number = st.integers() | st.floats(allow_nan=False)
-a_heap = st.builds(Heap, elements=st.lists(a_number))
-a_nonempty_heap = st.builds(Heap, elements=st.lists(a_number, min_size=1))
+a_heap = st.builds(
+    Heap,
+    elements=st.one_of(
+        st.lists(a_number),
+        st.lists(st.text()),
+    )
+)
+a_nonempty_heap = st.builds(
+    Heap,
+    elements=st.one_of(
+        st.lists(a_number, min_size=1),
+        st.lists(st.text(), min_size=1),
+    )
+)
 
 """
 Tests
@@ -56,14 +64,23 @@ def test_that_a_heap_peeks_its_min_value(heap):
 @given(a_nonempty_heap)
 def test_that_a_heap_that_inserts_a_min_value_can_then_find_it(heap):
     original_min = heap.min()
-    new_min = original_min - 1
+    match original_min:
+        case int(original_min) | float(original_min):
+            new_min = original_min - 1
+        case _:
+            new_min = ""
+
     new_heap = heap.insert(new_min)
     assert new_heap.min() == new_min
 
 @given(a_nonempty_heap)
 def test_that_a_heap_that_deletes_its_top_value_can_then_not_find_it(heap):
     original_min = heap.min()
-    new_min = original_min - 1
+    match original_min:
+        case int(original_min) | float(original_min):
+            new_min = original_min - 1
+        case _:
+            new_min = ""
 
     new_heap = heap.insert(new_min)
     final_heap = new_heap.delete_top()
@@ -76,8 +93,6 @@ Stateful tests
 """
 
 class HeapStateMachine(RuleBasedStateMachine):
-    #elements = Bundle("elements")
-
     def __init__(self):
         super().__init__()
 
