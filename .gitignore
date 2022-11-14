@@ -1,1 +1,3 @@
 .python-version
+.hypothesis/
+__pycache__/
