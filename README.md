@@ -5,11 +5,12 @@ a "domain business logic".
 
 The code is structured in the following way:
 
-    - domain: core business logic implemented in memory
-    - data generation strategies: based on the entities defined in domain
-    - tests: use generated data to test the domain
-    - stateful tests [optional]: generate not only data but sequences of calls on the same
-        entities
+  - `code/{module}`: core business logic implemented in memory, one per module.
+  - data generation strategies: based on the entities defined in domain, defined info
+    `test/{module}/conftest.py`
+  - tests: use generated data to test the domain (`test/{module}/test_{module}.py`)
+  - stateful tests [optional]: generate not only data but sequences of calls on the same
+      entities (same)
 
 # Running the code
 
