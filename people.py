@@ -1,9 +1,7 @@
 from __future__ import annotations
 from operator import attrgetter
 from dataclasses import dataclass, replace
-from typing import Sequence, Iterable, Iterator
-import string
-import json
+from typing import Sequence, Iterator
 
 from faker import Faker
 from hypothesis import given
