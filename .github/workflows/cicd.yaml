@@ -21,7 +21,7 @@ jobs:
       - name: Lint with flake8
         run: make static_checks
       - name: Test with pytest
-        run: make test
+        run: make test CI_ROLE=ci
       - name: Get coverage
         uses: orgoro/coverage@v3
         with:

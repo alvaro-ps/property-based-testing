@@ -3,9 +3,8 @@ build:
 	pip install flake8 pytest
 	if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
+COVERAGE_OUTPUT := coverage.xml
 test:
-	CI_ROLE=ci
-	COVERAGE_OUTPUT=xml:output/coverage.yml
 	coverage xml -o ${COVERAGE_OUTPUT}
 
 static_checks:

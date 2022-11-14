@@ -1,3 +1,4 @@
 .python-version
 .hypothesis/
 __pycache__/
+coverage.xml
