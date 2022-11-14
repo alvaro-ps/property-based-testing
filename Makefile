@@ -3,9 +3,13 @@ build:
 	pip install flake8 pytest
 	if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
-COVERAGE_OUTPUT := coverage.xml
 test:
-	coverage xml -o ${COVERAGE_OUTPUT}
+	pytest tests/ --verbose
+
+COVERAGE_OUTPUT := xml:coverage.xml
+test-coverage:
+	pytest tests/ --verbose --cov-report=${COVERAGE_OUTPUT}
+
 
 static_checks:
 	# stop the build if there are Python syntax errors or undefined names
