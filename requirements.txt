@@ -1,0 +1,4 @@
+hypothesis
+faker
+ipython
+pytest
