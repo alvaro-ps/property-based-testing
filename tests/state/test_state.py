@@ -11,6 +11,7 @@ from tests.state.conftest import a_nonempty_heap, a_number
 def test_that_a_heap_peeks_its_min_value(heap):
     assert heap.min() == min(heap.elements)
 
+
 @given(a_nonempty_heap)
 def test_that_a_heap_that_inserts_a_min_value_can_then_find_it(heap):
     original_min = heap.min()
@@ -22,6 +23,7 @@ def test_that_a_heap_that_inserts_a_min_value_can_then_find_it(heap):
 
     new_heap = heap.insert(new_min)
     assert new_heap.min() == new_min
+
 
 @given(a_nonempty_heap)
 def test_that_a_heap_that_deletes_its_top_value_can_then_not_find_it(heap):
