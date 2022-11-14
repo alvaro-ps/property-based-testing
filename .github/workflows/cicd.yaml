@@ -21,9 +21,4 @@ jobs:
       - name: Lint with flake8
         run: make static_checks
       - name: Test with pytest
-        run: make test CI_ROLE=ci
-      - name: Get coverage
-        uses: orgoro/coverage@v3
-        with:
-          coverageFile: output/coverage.xml
-          token: ${{ secrets.GH_TOKEN }}
+        run: make test-coverage CI_ROLE=ci
