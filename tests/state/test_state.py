@@ -1,57 +1,9 @@
-from __future__ import annotations
-from dataclasses import dataclass, field
-from typing import Generic, Optional, TypeVar
-import heapq
 from hypothesis import given
-import hypothesis.strategies as st
 from hypothesis.stateful import  RuleBasedStateMachine, rule, precondition, invariant
 
-T = TypeVar("T")
+from code.state import Heap
+from tests.state.conftest import a_nonempty_heap, a_number
 
-"""
-Domain
-"""
-
-@dataclass
-class Heap(Generic[T]):
-    elements: list[T] = field(default_factory=list)
-
-    def __post_init__(self):
-        heapq.heapify(self.elements)
-
-    def insert(self, element: T) -> Heap:
-        heapq.heappush(self.elements, element)
-        return self
-
-    def delete_top(self) -> Heap:
-        heapq.heappop(self.elements)
-        return self
-
-    def min(self) -> Optional[T]:
-        """Smallest"""
-        try:
-            return self.elements[0]
-        except IndexError:
-            return None
-
-"""
-Data generation strategies
-"""
-a_number = st.integers() | st.floats(allow_nan=False)
-a_heap = st.builds(
-    Heap,
-    elements=st.one_of(
-        st.lists(a_number),
-        st.lists(st.text()),
-    )
-)
-a_nonempty_heap = st.builds(
-    Heap,
-    elements=st.one_of(
-        st.lists(a_number, min_size=1),
-        st.lists(st.text(), min_size=1),
-    )
-)
 
 """
 Tests
