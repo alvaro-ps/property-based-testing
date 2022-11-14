@@ -2,6 +2,7 @@ from __future__ import annotations
 from dataclasses import dataclass, replace
 from typing import Sequence, Iterator
 
+
 @dataclass
 class Person:
     first_name: str

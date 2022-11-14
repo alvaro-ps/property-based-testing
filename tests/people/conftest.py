@@ -5,6 +5,7 @@ import hypothesis.strategies as st
 
 from code.people import Person, People
 
+
 fake = Faker()
 
 
@@ -14,6 +15,7 @@ an_adult = st.builds(
     last_name=st.builds(fake.last_name),
     age=st.integers(min_value=18, max_value=120),
 )
+
 
 a_kid = st.builds(
     Person,
@@ -30,6 +32,6 @@ def create_family(data, last_name: Optional[str] = None, n_kids: Optional[int] =
     kids = [data.draw(a_kid) for _ in range(total_kids)]
 
     return People(*parents, *kids).map(lambda person: person.with_last_name(family_name))
-    
+
 
 some_people = st.builds(People.from_list, st.lists(an_adult, min_size=0))

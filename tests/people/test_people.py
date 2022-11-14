@@ -7,6 +7,7 @@ import hypothesis.strategies as st
 from code.people import People
 from tests.people.conftest import an_adult, a_kid, some_people, create_family
 
+
 @given(an_adult)
 def test_that_a_person_will_not_live_more_than_200_years_yet(person):
     assert person.age <= 200
@@ -31,9 +32,11 @@ def test_that_a_new_year_adds_n_total_years_across_people(people):
 
     assert (total_years_after - total_years_before) == len(people)
 
+
 @given(st.builds(People.from_list, st.lists(a_kid)))
 def test_that_no_kid_is_a_grownup(kids):
     assert kids.grown_ups() == People()
+
 
 @given(st.data())
 def test_that_a_family_has_two_adults_and_may_have_no_kids(data):

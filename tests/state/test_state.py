@@ -1,13 +1,11 @@
 from hypothesis import given
-from hypothesis.stateful import  RuleBasedStateMachine, rule, precondition, invariant
+from hypothesis.stateful import RuleBasedStateMachine, rule, precondition, invariant
 
 from code.state import Heap
 from tests.state.conftest import a_nonempty_heap, a_number
 
 
-"""
-Tests
-"""
+# Tests
 
 @given(a_nonempty_heap)
 def test_that_a_heap_peeks_its_min_value(heap):
@@ -40,9 +38,8 @@ def test_that_a_heap_that_deletes_its_top_value_can_then_not_find_it(heap):
 
     assert final_min == original_min
 
-"""
-Stateful tests
-"""
+
+# Stateful tests
 
 class HeapStateMachine(RuleBasedStateMachine):
     def __init__(self):
